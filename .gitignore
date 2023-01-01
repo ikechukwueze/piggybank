@@ -7,3 +7,4 @@
 *.pyc
 local.py
 staging.py
+**/migrations/0*.py
