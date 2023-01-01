@@ -1,6 +1,7 @@
 /.DS_Store
 .env
 /zpy-env
+/.vscode
 /wallet-service
 *.sqlite3
 *.pyc
