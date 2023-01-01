@@ -1,1 +1,8 @@
 /.DS_Store
+.env
+/zpy-env
+/wallet-service
+*.sqlite3
+*.pyc
+local.py
+staging.py
