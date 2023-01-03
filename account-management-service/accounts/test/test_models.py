@@ -29,4 +29,12 @@ class ModelTest(TestCase):
         for field, max_length in self.field_max_lengths.items():
             self.assertEquals(Account._meta.get_field(field).max_length, max_length)
 
+    def test_create_superuser_account(self):
+        superuser_account = Account.objects.create_superuser(**self.account_details)
+        self.assertEqual(Account.objects.count(), 1)
+        self.account_details.pop("password")
+        for field, value in self.account_details.items():
+            self.assertEqual(getattr(superuser_account, field), value)
+        self.assertTrue(superuser_account.is_admin)
+
     
