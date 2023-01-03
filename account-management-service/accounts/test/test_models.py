@@ -37,4 +37,9 @@ class ModelTest(TestCase):
             self.assertEqual(getattr(superuser_account, field), value)
         self.assertTrue(superuser_account.is_admin)
 
-    
+    def test_create_account(self):
+        account = Account.objects.create(**self.account_details)
+        self.assertEqual(Account.objects.count(), 1)
+        self.account_details.pop("password")
+        for field, value in self.account_details.items():
+            self.assertEqual(getattr(account, field), value)
