@@ -77,4 +77,7 @@ class ModelTest(TestCase):
         with self.assertRaisesMessage(ValidationError, "BVN should be 11 digits"):
             Account.objects.create(**self.account_details)
     
-    
+    def test_non_numeric_bvn_raises_exception(self):
+        self.account_details["bvn"] = "1234567890k"
+        with self.assertRaisesMessage(ValidationError, "BVN should contain digits only"):
+            Account.objects.create(**self.account_details)
