@@ -53,3 +53,13 @@ class ModelTest(TestCase):
         self.account_details["last_name"] = "J"
         with self.assertRaisesMessage(ValidationError, "Last name should have at least 2 letters"):
             Account.objects.create(**self.account_details)
+    
+    def test_phone_number_with_invalid_length_raises_exception(self):
+        self.account_details["phone_number"] = self.account_details["phone_number"][:10]
+        with self.assertRaisesMessage(ValidationError, "Phone number should be 11 digits"):
+            Account.objects.create(**self.account_details)
+        
+        self.account_details["phone_number"] = self.account_details["phone_number"] + "1234"
+        with self.assertRaisesMessage(ValidationError, "Phone number should be 11 digits"):
+            Account.objects.create(**self.account_details)
+    
