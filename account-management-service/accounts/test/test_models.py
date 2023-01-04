@@ -43,3 +43,8 @@ class ModelTest(TestCase):
         self.account_details.pop("password")
         for field, value in self.account_details.items():
             self.assertEqual(getattr(account, field), value)
+    
+    def test_first_name_with_invalid_min_length_raises_exception(self):
+        self.account_details["first_name"] = "J"
+        with self.assertRaisesMessage(ValidationError, "First name should have at least 2 letters"):
+            Account.objects.create(**self.account_details)
