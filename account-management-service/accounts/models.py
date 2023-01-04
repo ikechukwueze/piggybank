@@ -2,26 +2,21 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils import timezone
-from django.core.validators import MinLengthValidator
 from .manager import AccountManager
 from .custom_validators import numeric_string_validator
 
 
 class Account(AbstractBaseUser):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    first_name = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
-    last_name = models.CharField(max_length=50, validators=[MinLengthValidator(2)])
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-    phone_number = models.CharField(
-        max_length=11, 
-        validators=[MinLengthValidator(11), numeric_string_validator]
-    )
+    phone_number = models.CharField(max_length=11)
     bvn = models.CharField(
         max_length=11,
-        validators=[MinLengthValidator(11), numeric_string_validator],
         unique=True,
         null=True,
-        blank=True,
+        blank=True
     )
     signup_date = models.DateTimeField(default=timezone.now)
     is_verified = models.BooleanField(default=False)
