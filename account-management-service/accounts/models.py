@@ -51,6 +51,9 @@ class Account(AbstractBaseUser):
         if len(self.phone_number) != 11:
             raise ValidationError({"phone_number": "Phone number should be 11 digits"})
 
+        if self.bvn and len(self.bvn) != 11:
+            raise ValidationError({"bvn": "Bvn should be 11 digits"})
+
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
