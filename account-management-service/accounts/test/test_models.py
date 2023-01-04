@@ -63,3 +63,9 @@ class ModelTest(TestCase):
         with self.assertRaisesMessage(ValidationError, "Phone number should be 11 digits"):
             Account.objects.create(**self.account_details)
     
+    def test_non_numeric_phone_number_raises_exception(self):
+        self.account_details["phone_number"] = self.account_details["phone_number"][:10] + "k"
+        with self.assertRaisesMessage(ValidationError, "Phone number should contain digits only"):
+            Account.objects.create(**self.account_details)
+    
+    
