@@ -52,7 +52,7 @@ class Account(AbstractBaseUser):
             raise ValidationError({"phone_number": "Phone number should be 11 digits"})
 
         if self.bvn and len(self.bvn) != 11:
-            raise ValidationError({"bvn": "Bvn should be 11 digits"})
+            raise ValidationError({"bvn": "BVN should be 11 digits"})
 
         numeric_string_validator(
             "phone_number", self.phone_number, "Phone number should contain digits only"
