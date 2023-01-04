@@ -42,11 +42,14 @@ class Account(AbstractBaseUser):
             raise ValidationError(
                 {"first_name": "First name should have at least 2 letters"}
             )
-        
+
         if len(self.last_name) < 2:
             raise ValidationError(
                 {"last_name": "Last name should have at least 2 letters"}
             )
+
+        if len(self.phone_number) != 11:
+            raise ValidationError({"phone_number": "Phone number should be 11 digits"})
 
     def save(self, *args, **kwargs):
         self.full_clean()
