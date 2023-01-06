@@ -23,7 +23,7 @@ class SignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError("Phone number should contain only digits.")
         return value
 
-    def validate(self, attrs: dict) -> dict:
+    def validate(self, attrs: dict) -> Union[serializers.ValidationError, dict]:
         password = attrs["password"]
         confirm_password = attrs.pop("confirm_password")
         if not password == confirm_password:
