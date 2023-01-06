@@ -18,13 +18,9 @@ class SignUpSerializer(serializers.Serializer):
             raise serializers.ValidationError("An account with this email already exists.")
         return value
 
-    def validate_phone_number(self, value: str) -> str:
-        numeric_string_validator(
-            "phone_number",
-            value,
-            serializers.ValidationError,
-            "Phone number should contain digits only",
-        )
+    def validate_phone_number(self, value: str) -> Union[serializers.ValidationError, str]:
+        if not value.isnumeric():
+            raise serializers.ValidationError("Phone number should contain only digits.")
         return value
 
     def validate(self, attrs: dict) -> dict:
