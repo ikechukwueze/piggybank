@@ -1,7 +1,11 @@
 from django.contrib.auth.models import BaseUserManager
+from django.db.models import Model
+from django.db import transaction
+from knox.models import AuthToken
 
 
 class AccountManager(BaseUserManager):
+    @transaction.atomic
     def create_user(
         self,
         email: str,
@@ -9,7 +13,12 @@ class AccountManager(BaseUserManager):
         last_name: str,
         phone_number: str,
         password: str = None,
-    ):
+    ) -> tuple[Model, str]:
+        """
+        The create user model manager method, creates a user account
+        with specified details and also creates a token for 
+        the newly created user account.
+        """
         if not email:
             raise ValueError("Email must be provided")
 
@@ -30,7 +39,9 @@ class AccountManager(BaseUserManager):
         )
         account.set_password(password)
         account.save(using=self._db)
-        return account
+        # create user auth token
+        _, token = AuthToken.objects.create(user=account)
+        return account, token
 
     def create_superuser(
         self,
@@ -40,7 +51,7 @@ class AccountManager(BaseUserManager):
         phone_number: str,
         password: str
     ):
-        account = self.create_user(
+        account, _ = self.create_user(
             email=email,
             first_name=first_name,
             last_name=last_name,
