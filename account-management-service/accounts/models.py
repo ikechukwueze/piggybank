@@ -55,9 +55,14 @@ class Account(AbstractBaseUser):
             raise ValidationError({"bvn": "BVN should be 11 digits"})
 
         numeric_string_validator(
-            "phone_number", self.phone_number, "Phone number should contain digits only"
+            "phone_number",
+            self.phone_number,
+            ValidationError,
+            {"phone_number": "Phone number should contain digits only"},
         )
-        numeric_string_validator("bvn", self.bvn, "BVN should contain digits only")
+        numeric_string_validator(
+            "bvn", self.bvn, ValidationError, {"bvn": "BVN should contain digits only"}
+        )
 
     def save(self, *args, **kwargs):
         self.full_clean()
