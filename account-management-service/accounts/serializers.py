@@ -1,7 +1,6 @@
 from typing import Union
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from .custom_validators import numeric_string_validator
 from .models import Account
 
 
