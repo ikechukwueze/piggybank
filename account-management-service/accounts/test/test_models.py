@@ -70,7 +70,7 @@ class ModelTest(TestCase):
     
     def test_bvn_with_invalid_length_raises_exception(self):
         self.account_details["bvn"] = "1234567890"
-        with self.assertRaisesMessage(ValidationError, "Bvn should be 11 digits"):
+        with self.assertRaisesMessage(ValidationError, "BVN should be 11 digits"):
             Account.objects.create(**self.account_details)
         
         self.account_details["bvn"] = self.account_details["bvn"] + "1234"
