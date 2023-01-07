@@ -14,12 +14,18 @@ class SignUpSerializer(serializers.Serializer):
 
     def validate_email(self, value: str) -> Union[serializers.ValidationError, str]:
         if Account.objects.filter(email=value).exists():
-            raise serializers.ValidationError("An account with this email already exists.")
+            raise serializers.ValidationError(
+                "An account with this email already exists."
+            )
         return value
 
-    def validate_phone_number(self, value: str) -> Union[serializers.ValidationError, str]:
+    def validate_phone_number(
+        self, value: str
+    ) -> Union[serializers.ValidationError, str]:
         if not value.isnumeric():
-            raise serializers.ValidationError("Phone number should contain only digits.")
+            raise serializers.ValidationError(
+                "Phone number should contain only digits."
+            )
         return value
 
     def validate(self, attrs: dict) -> Union[serializers.ValidationError, dict]:
@@ -34,3 +40,4 @@ class SignUpSerializer(serializers.Serializer):
     def create(self, validated_data: dict) -> tuple[Account, str]:
         account, token = Account.objects.create_user(**validated_data)
         return account, token
+
