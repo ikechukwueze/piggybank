@@ -3,8 +3,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from knox.models import AuthToken
+from knox.settings import knox_settings
 from .manager import AccountManager
 from .custom_validators import numeric_string_validator
+from .custom_exceptions import MaximumTokensExceeded
 
 
 class Account(AbstractBaseUser):
@@ -67,3 +70,14 @@ class Account(AbstractBaseUser):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+    def get_token(self) -> str:
+        token_ttl = knox_settings.TOKEN_TTL
+        token_limit_per_account = knox_settings.TOKEN_LIMIT_PER_USER
+        now = timezone.now()
+        existing_tokens = AuthToken.objects.filter(user=self, expiry__gt=now)
+        if token_limit_per_account and existing_tokens.count() >= token_limit_per_account:
+            raise MaximumTokensExceeded
+
+        _, token = AuthToken.objects.create(self, token_ttl)
+        return token
