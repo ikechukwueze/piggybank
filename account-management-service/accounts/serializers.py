@@ -1,5 +1,6 @@
 from typing import Union
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 from .models import Account
 
@@ -41,3 +42,23 @@ class SignUpSerializer(serializers.Serializer):
         account, token = Account.objects.create_user(**validated_data)
         return account, token
 
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True)
+
+    def validate(self, attrs: dict) -> Union[serializers.ValidationError, dict]:
+        account = authenticate(**attrs)
+        if not account:
+            raise serializers.ValidationError(
+                {
+                    "email": "Incorrect email or password",
+                    "password": "Incorrect email or password."
+                }
+            )
+        if not account.is_active:
+            raise serializers.ValidationError(
+                {"email": "This account has been suspended."}
+            )
+        attrs["account"] = account
+        return attrs
