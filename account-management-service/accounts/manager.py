@@ -52,7 +52,7 @@ class AccountManager(BaseUserManager):
         last_name: str,
         phone_number: str,
         password: str
-    ):
+    ) -> Model:
         account, _ = self.create_user(
             email=email,
             first_name=first_name,
