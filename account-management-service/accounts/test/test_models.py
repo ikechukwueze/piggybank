@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 from django.contrib.auth.hashers import check_password
 from knox.models import AuthToken
