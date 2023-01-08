@@ -72,7 +72,10 @@ class Account(AbstractBaseUser):
         token_limit_per_account = knox_settings.TOKEN_LIMIT_PER_USER
         now = timezone.now()
         existing_tokens = AuthToken.objects.filter(user=self, expiry__gt=now)
-        if token_limit_per_account and existing_tokens.count() >= token_limit_per_account:
+        if (
+            token_limit_per_account
+            and existing_tokens.count() >= token_limit_per_account
+        ):
             raise MaximumTokensExceeded
 
         _, token = AuthToken.objects.create(self, token_ttl)
