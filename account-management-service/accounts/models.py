@@ -6,7 +6,6 @@ from django.utils import timezone
 from knox.models import AuthToken
 from knox.settings import knox_settings
 from .manager import AccountManager
-from .custom_validators import numeric_string_validator
 from .custom_exceptions import MaximumTokensExceeded
 
 
@@ -53,19 +52,16 @@ class Account(AbstractBaseUser):
 
         if len(self.phone_number) != 11:
             raise ValidationError({"phone_number": "Phone number should be 11 digits"})
+        if not self.phone_number.isnumeric():
+            raise ValidationError(
+                {"phone_number": "Phone number should contain digits only"}
+            )
 
-        if self.bvn and len(self.bvn) != 11:
-            raise ValidationError({"bvn": "BVN should be 11 digits"})
-
-        numeric_string_validator(
-            "phone_number",
-            self.phone_number,
-            ValidationError,
-            {"phone_number": "Phone number should contain digits only"},
-        )
-        numeric_string_validator(
-            "bvn", self.bvn, ValidationError, {"bvn": "BVN should contain digits only"}
-        )
+        if self.bvn:
+            if len(self.bvn) != 11:
+                raise ValidationError({"bvn": "BVN should be 11 digits"})
+            if not self.bvn.isnumeric():
+                raise ValidationError({"bvn": "BVN should contain digits only"})
 
     def save(self, *args, **kwargs):
         self.full_clean()
