@@ -6,7 +6,7 @@ from django.utils import timezone
 from knox.models import AuthToken
 from knox.settings import knox_settings
 from .manager import AccountManager
-from .custom_exceptions import MaximumTokensExceeded
+from utils.exceptions import MaximumTokensExceeded
 
 
 class Account(AbstractBaseUser):
