@@ -46,41 +46,61 @@ class ModelTest(TestCase):
         for field, value in self.account_details.items():
             self.assertEqual(getattr(account, field), value)
         self.assertTrue(check_password(password, account.password))
-    
+
     def test_first_name_with_invalid_min_length_raises_exception(self):
         self.account_details["first_name"] = "J"
-        with self.assertRaisesMessage(ValidationError, "First name should have at least 2 letters"):
-            Account.objects.create(**self.account_details)
-    
+        with self.assertRaisesMessage(
+            ValidationError, "First name should have at least 2 letters"
+        ):
+            Account.objects.create_user(**self.account_details)
+
     def test_last_name_with_invalid_min_length_raises_exception(self):
         self.account_details["last_name"] = "J"
-        with self.assertRaisesMessage(ValidationError, "Last name should have at least 2 letters"):
-            Account.objects.create(**self.account_details)
-    
+        with self.assertRaisesMessage(
+            ValidationError, "Last name should have at least 2 letters"
+        ):
+            Account.objects.create_user(**self.account_details)
+
     def test_phone_number_with_invalid_length_raises_exception(self):
+        # phone number len less than 11
         self.account_details["phone_number"] = self.account_details["phone_number"][:10]
-        with self.assertRaisesMessage(ValidationError, "Phone number should be 11 digits"):
-            Account.objects.create(**self.account_details)
-        
-        self.account_details["phone_number"] = self.account_details["phone_number"] + "1234"
-        with self.assertRaisesMessage(ValidationError, "Phone number should be 11 digits"):
-            Account.objects.create(**self.account_details)
-    
+        with self.assertRaisesMessage(
+            ValidationError, "Phone number should be 11 digits"
+        ):
+            Account.objects.create_user(**self.account_details)
+
+        # phone number len greater than 11
+        self.account_details["phone_number"] = (
+            self.account_details["phone_number"] + "1234"
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "Phone number should be 11 digits"
+        ):
+            Account.objects.create_user(**self.account_details)
+
     def test_non_numeric_phone_number_raises_exception(self):
-        self.account_details["phone_number"] = self.account_details["phone_number"][:10] + "k"
-        with self.assertRaisesMessage(ValidationError, "Phone number should contain digits only"):
-            Account.objects.create(**self.account_details)
-    
+        self.account_details["phone_number"] = (
+            self.account_details["phone_number"][:10] + "k"
+        )
+        with self.assertRaisesMessage(
+            ValidationError, "Phone number should contain digits only"
+        ):
+            Account.objects.create_user(**self.account_details)
+
     def test_bvn_with_invalid_length_raises_exception(self):
+        # bvn len less than 11
         self.account_details["bvn"] = "1234567890"
         with self.assertRaisesMessage(ValidationError, "BVN should be 11 digits"):
-            Account.objects.create(**self.account_details)
-        
+            Account.objects.create_user(**self.account_details)
+
+        # bvn len greater than 11
         self.account_details["bvn"] = self.account_details["bvn"] + "1234"
         with self.assertRaisesMessage(ValidationError, "BVN should be 11 digits"):
-            Account.objects.create(**self.account_details)
-    
+            Account.objects.create_user(**self.account_details)
+
     def test_non_numeric_bvn_raises_exception(self):
         self.account_details["bvn"] = "1234567890k"
-        with self.assertRaisesMessage(ValidationError, "BVN should contain digits only"):
-            Account.objects.create(**self.account_details)
+        with self.assertRaisesMessage(
+            ValidationError, "BVN should contain digits only"
+        ):
+            Account.objects.create_user(**self.account_details)
