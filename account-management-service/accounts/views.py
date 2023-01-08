@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import SignUpSerializer
 from .serializers import LoginSerializer
-from .custom_exceptions import MaximumTokensExceeded
+from utils.exceptions import MaximumTokensExceeded
 
 # Create your views here.
 
