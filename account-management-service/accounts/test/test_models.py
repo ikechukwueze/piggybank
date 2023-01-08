@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import check_password
 from knox.models import AuthToken
 from accounts.models import Account
 
@@ -41,9 +42,10 @@ class ModelTest(TestCase):
     def test_create_account(self):
         account, _ = Account.objects.create_user(**self.account_details)
         self.assertEqual(Account.objects.count(), 1)
-        self.account_details.pop("password")
+        password = self.account_details.pop("password")
         for field, value in self.account_details.items():
             self.assertEqual(getattr(account, field), value)
+        self.assertTrue(check_password(password, account.password))
     
     def test_first_name_with_invalid_min_length_raises_exception(self):
         self.account_details["first_name"] = "J"
