@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from knox.models import AuthToken
 from accounts.models import Account
 
 
@@ -38,7 +39,7 @@ class ModelTest(TestCase):
         self.assertTrue(superuser_account.is_admin)
 
     def test_create_account(self):
-        account = Account.objects.create(**self.account_details)
+        account, _ = Account.objects.create_user(**self.account_details)
         self.assertEqual(Account.objects.count(), 1)
         self.account_details.pop("password")
         for field, value in self.account_details.items():
