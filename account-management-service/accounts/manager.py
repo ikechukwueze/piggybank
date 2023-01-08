@@ -12,6 +12,7 @@ class AccountManager(BaseUserManager):
         first_name: str,
         last_name: str,
         phone_number: str,
+        bvn: str = None,
         password: str = None,
     ) -> tuple[Model, str]:
         """
@@ -36,6 +37,7 @@ class AccountManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
+            bvn=bvn
         )
         account.set_password(password)
         account.save(using=self._db)
