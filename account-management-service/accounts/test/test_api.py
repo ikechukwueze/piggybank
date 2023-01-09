@@ -22,6 +22,9 @@ class APITest(APITestCase):
         response = self.client.post(
             self.account_signup_url, self.account_details, format="json"
         )
+        expected_keys = ["first_name", "last_name", "email", "token"]
+        for key in expected_keys:
+            self.assertIn(key, response.data.keys())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
             response.data["first_name"], self.account_details["first_name"]
@@ -32,4 +35,6 @@ class APITest(APITestCase):
         self.assertEqual(
             response.data["email"], self.account_details["email"]
         )
+        self.assertNotEqual(response.data["token"], "")
         self.assertEqual(Account.objects.count(), 1)
+
