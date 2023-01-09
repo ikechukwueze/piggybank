@@ -38,3 +38,13 @@ class APITest(APITestCase):
         self.assertNotEqual(response.data["token"], "")
         self.assertEqual(Account.objects.count(), 1)
 
+    def test_account_signup_token(self):
+        response = self.client.post(
+            self.account_signup_url, self.account_details, format="json"
+        )
+        account_email = response.data["email"]
+        response_token = response.data["token"]
+        account = Account.objects.get(email=account_email)
+        hashed_token = AuthToken.objects.get(user=account).digest
+        self.assertEqual(hashed_token, crypto.hash_token(response_token))
+
