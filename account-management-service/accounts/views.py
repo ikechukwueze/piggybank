@@ -22,7 +22,7 @@ class AccountSignUpView(APIView):
             "email": account.email,
             "token": token
         }
-        return Response(account_details, status=status.HTTP_201_OK)
+        return Response(account_details, status=status.HTTP_201_CREATED)
 
 
 class AccountLoginView(APIView):
