@@ -1,9 +1,10 @@
 from django.shortcuts import render
+from django.contrib.auth.hashers import check_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import SignUpSerializer
-from .serializers import LoginSerializer
+from rest_framework.permissions import IsAuthenticated
+from .serializers import SignUpSerializer, LoginSerializer, ChangePasswordSerializer
 from utils.exceptions import MaximumTokensExceeded
 
 # Create your views here.
@@ -48,3 +49,19 @@ class AccountLoginView(APIView):
                 "token": token
             }
             return Response(account_details, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        account = self.request.user
+        serializer = ChangePasswordSerializer(
+            instance=account, data=request.data, context={"account": account}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"message": "Password changed successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )
