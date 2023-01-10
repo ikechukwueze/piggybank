@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import SignUpSerializer, LoginSerializer, ChangePasswordSerializer
+from .serializers import SignUpSerializer, LoginSerializer, ChangePasswordSerializer, UpdateBvnSerializer
 from utils.exceptions import MaximumTokensExceeded
 
 # Create your views here.
@@ -61,5 +61,21 @@ class ChangePasswordView(APIView):
         serializer.save()
         return Response(
             {"message": "Password changed successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+class UpdateBvnView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        account = self.request.user
+        serializer = UpdateBvnSerializer(
+            instance=account, data=request.data, context={"account": account}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"message": "Bvn updated successfully"},
             status=status.HTTP_202_ACCEPTED,
         )
