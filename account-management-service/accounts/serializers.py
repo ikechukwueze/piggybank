@@ -53,7 +53,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {
                     "email": "Incorrect email or password",
-                    "password": "Incorrect email or password."
+                    "password": "Incorrect email or password.",
                 }
             )
         if not account.is_active:
@@ -73,7 +73,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         if not account.check_password(value):
             raise serializers.ValidationError("Old password is incorrect")
         return value
-    
+
     def validate_new_password(self, value: str):
         account = self.context["account"]
         validate_password(password=value, user=account)
@@ -81,5 +81,23 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.set_password(validated_data["new_password"])
+        instance.save()
+        return instance
+
+
+class UpdateBvnSerializer(serializers.Serializer):
+    bvn = serializers.CharField(required=True, min_length=11, max_length=11)
+
+    def validate_bvn(
+        self, value: str
+    ) -> Union[serializers.ValidationError, str]:
+        if not value.isnumeric():
+            raise serializers.ValidationError(
+                "Bvn should contain only digits."
+            )
+        return value
+
+    def update(self, instance, validated_data):
+        instance.bvn(validated_data["bvn"])
         instance.save()
         return instance
