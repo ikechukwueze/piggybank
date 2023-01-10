@@ -1,0 +1,19 @@
+[
+    {
+        "model": "accounts.account",
+        "pk": "6317d2d6-0985-445c-a063-471e371061df",
+        "fields": {
+            "password": "pbkdf2_sha256$390000$AWt6rHyTOuEWAjFDX57wcV$Bu4H9GwoqvVW5FtWoosUfhiDdr973bUWCgAiIgKVpF0=",
+            "last_login": null,
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "email": "janedoe@mail.com",
+            "phone_number": "12345678901",
+            "bvn": null,
+            "signup_date": "2023-01-09T13:21:25.927Z",
+            "is_verified": false,
+            "is_active": true,
+            "is_admin": false
+        }
+    }
+]
