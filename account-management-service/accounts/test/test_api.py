@@ -1,6 +1,6 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
-from rest_framework import status
+from rest_framework import status, serializers
 from accounts.models import Account
 from knox.models import AuthToken
 from knox import crypto
@@ -20,6 +20,7 @@ class APITest(APITestCase):
         }
         self.account_signup_url = reverse("account_signup")
         self.account_login_url = reverse("account_login")
+        self.change_password_url = reverse("change_account_password")
 
     def test_account_signup(self):
         response = self.client.post(
@@ -55,4 +56,18 @@ class APITest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["email"], login_details["email"])
         self.assertNotEqual(response.data["token"], "")
-        self.assertTrue(AuthToken.objects.filter(user__email="janedoe@mail.com").exists())
+        self.assertTrue(
+            AuthToken.objects.filter(user__email="janedoe@mail.com").exists()
+        )
+
+    def test_change_password(self):
+        response = self.client.post(self.account_signup_url, self.account_details, format="json")
+        token = response.data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        change_password_response = self.client.patch(
+            self.change_password_url,
+            {"old_password": "fakepassword", "new_password": "newfakepassword"},
+            format="json"
+        )
+        self.assertEqual(change_password_response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(change_password_response.data, {"message": "Password changed successfully"})
