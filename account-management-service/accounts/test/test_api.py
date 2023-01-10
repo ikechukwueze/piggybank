@@ -21,6 +21,7 @@ class APITest(APITestCase):
         self.account_signup_url = reverse("account_signup")
         self.account_login_url = reverse("account_login")
         self.change_password_url = reverse("change_account_password")
+        self.update_bvn_url = reverse("update_bvn")
 
     def test_account_signup(self):
         response = self.client.post(
@@ -71,3 +72,15 @@ class APITest(APITestCase):
         )
         self.assertEqual(change_password_response.status_code, status.HTTP_202_ACCEPTED)
         self.assertEqual(change_password_response.data, {"message": "Password changed successfully"})
+
+    def test_update_bvn(self):
+        response = self.client.post(self.account_signup_url, self.account_details, format="json")
+        token = response.data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        update_bvn_response = self.client.patch(
+            self.update_bvn_url,
+            {"bvn": "12345678901"},
+            format="json"
+        )
+        self.assertEqual(update_bvn_response.status_code, status.HTTP_202_ACCEPTED)
+        self.assertEqual(update_bvn_response.data, {"message": "Bvn updated successfully"})
