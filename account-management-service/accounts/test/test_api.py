@@ -61,6 +61,9 @@ class APITest(APITestCase):
             AuthToken.objects.filter(user__email="janedoe@mail.com").exists()
         )
 
+    def test_cannot_login_with_incorrect_details(self):
+        pass
+
     def test_change_password(self):
         response = self.client.post(self.account_signup_url, self.account_details, format="json")
         token = response.data["token"]
@@ -84,3 +87,6 @@ class APITest(APITestCase):
         )
         self.assertEqual(update_bvn_response.status_code, status.HTTP_202_ACCEPTED)
         self.assertEqual(update_bvn_response.data, {"message": "Bvn updated successfully"})
+    
+    def test_raises_exception_for_invalid_bvn(self):
+        pass
