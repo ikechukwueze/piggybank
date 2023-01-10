@@ -98,6 +98,6 @@ class UpdateBvnSerializer(serializers.Serializer):
         return value
 
     def update(self, instance, validated_data):
-        instance.bvn(validated_data["bvn"])
+        instance.bvn = validated_data["bvn"]
         instance.save()
         return instance
