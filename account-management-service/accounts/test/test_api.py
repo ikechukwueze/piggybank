@@ -62,7 +62,11 @@ class APITest(APITestCase):
         )
 
     def test_cannot_login_with_incorrect_details(self):
-        pass
+        login_details = {"email": "janedoe@mail.com", "password": "badfakepassword"}
+        response = self.client.post(
+            self.account_login_url, login_details, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_change_password(self):
         response = self.client.post(self.account_signup_url, self.account_details, format="json")
