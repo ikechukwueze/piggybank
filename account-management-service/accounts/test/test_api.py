@@ -93,4 +93,13 @@ class APITest(APITestCase):
         self.assertEqual(update_bvn_response.data, {"message": "Bvn updated successfully"})
     
     def test_raises_exception_for_invalid_bvn(self):
-        pass
+        response = self.client.post(self.account_signup_url, self.account_details, format="json")
+        token = response.data["token"]
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+        update_bvn_response = self.client.patch(
+            self.update_bvn_url,
+            {"bvn": "123456789"},
+            format="json"
+        )
+        self.assertEqual(update_bvn_response.status_code, status.HTTP_400_BAD_REQUEST)
+        
