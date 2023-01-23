@@ -2,7 +2,7 @@
 .env
 /zpy-env
 /.vscode
-/wallet-service
+#/wallet-service
 *.sqlite3
 *.pyc
 local.py
