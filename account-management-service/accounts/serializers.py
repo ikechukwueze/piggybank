@@ -2,6 +2,11 @@ from typing import Union
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 from rest_framework import serializers
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_str, smart_str, smart_bytes, DjangoUnicodeDecodeError
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from .models import Account
 
 
@@ -68,7 +73,7 @@ class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
 
-    def validate_old_password(self, value: str):
+    def validate_old_password(self, value: str) -> Union[serializers.ValidationError, dict]:
         account = self.context["account"]
         if not account.check_password(value):
             raise serializers.ValidationError("Old password is incorrect")
@@ -83,6 +88,16 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.set_password(validated_data["new_password"])
         instance.save()
         return instance
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, )
+
+    def validate_email(self, value):
+        try:
+            Account.objects.get(email=value)
+        except Account.DoesNotExist:
+            raise serializers.ValidationError({'error': 'Account with email does not exist.'})
 
 
 class UpdateBvnSerializer(serializers.Serializer):
