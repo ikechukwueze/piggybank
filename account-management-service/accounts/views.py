@@ -3,10 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import (
-    smart_bytes,
-)
-from django.utils.http import urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .serializers import (
@@ -14,9 +10,11 @@ from .serializers import (
     LoginSerializer,
     ChangePasswordSerializer,
     UpdateBvnSerializer,
-    ForgotPasswordSerializer,
+    RequestPasswordResetSerializer,
 )
 from utils.exceptions import MaximumTokensExceeded
+import jwt
+from django.conf import settings
 from .models import Account
 
 # Create your views here.
@@ -79,30 +77,34 @@ class ChangePasswordView(APIView):
         )
 
 
-class ForgotPasswordView(APIView):
+class RequestPasswordResetView(APIView):
     authentication_classes = []
     permission_classes = []
 
     def post(self, request):
-        serializer = ForgotPasswordSerializer(data=request.data)
+        serializer = RequestPasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        email = serializer.data
+        email = serializer.validated_data["email"]
         account = Account.objects.get(email=email)
-        encoded_account_id = urlsafe_base64_encode(smart_bytes(account.id))
         password_reset_token = PasswordResetTokenGenerator().make_token(account)
+        payload = {"account_id": str(account.id), "token": password_reset_token}
+        encoded_payload = jwt.encode(payload, settings.SECRET_KEY)
         current_site = get_current_site(request=request).domain
-        relative_link = reverse(
-            "email-password-reset",
-            kwargs={
-                "encoded-account-id": encoded_account_id,
-                "password-reset-token": password_reset_token,
-            },
+        relative_url = reverse(
+            "password-reset", kwargs={"encoded_jwt": encoded_payload}
         )
-        absolute_url = "http://" + current_site + relative_link
-        print(absolute_url)
+        password_reset_link = (
+            f"http://{current_site}{relative_url}"  # email password rest link
+        )
+        print(password_reset_link)
         return Response(
-            {"message": "Password reset email sent."}, status=status.HTTP_200_OK
+            {"message": "A password reset link has been sent to your email."},
+            status=status.HTTP_200_OK,
         )
+
+
+class PasswordResetView(APIView):
+    pass
 
 
 class UpdateBvnView(APIView):
