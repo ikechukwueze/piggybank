@@ -90,7 +90,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         return instance
 
 
-class ForgotPasswordSerializer(serializers.Serializer):
+class RequestPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, )
 
     def validate_email(self, value):
@@ -98,6 +98,8 @@ class ForgotPasswordSerializer(serializers.Serializer):
             Account.objects.get(email=value)
         except Account.DoesNotExist:
             raise serializers.ValidationError({'error': 'Account with email does not exist.'})
+        else:
+            return value
 
 
 class UpdateBvnSerializer(serializers.Serializer):
