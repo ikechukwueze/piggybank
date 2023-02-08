@@ -13,8 +13,6 @@ from .serializers import (
     RequestPasswordResetSerializer,
 )
 from utils.exceptions import MaximumTokensExceeded
-import jwt
-from django.conf import settings
 from .models import Account
 
 # Create your views here.
@@ -85,18 +83,21 @@ class RequestPasswordResetView(APIView):
         serializer = RequestPasswordResetSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data["email"]
-        account = Account.objects.get(email=email)
-        password_reset_token = PasswordResetTokenGenerator().make_token(account)
-        payload = {"account_id": str(account.id), "token": password_reset_token}
-        encoded_payload = jwt.encode(payload, settings.SECRET_KEY)
-        current_site = get_current_site(request=request).domain
-        relative_url = reverse(
-            "password-reset", kwargs={"encoded_jwt": encoded_payload}
-        )
-        password_reset_link = (
-            f"http://{current_site}{relative_url}"  # email password rest link
-        )
-        print(password_reset_link)
+        try:
+            account = Account.objects.get(email=email)
+        except Account.DoesNotExist:
+            pass
+        else:
+            password_reset_token = PasswordResetTokenGenerator().make_token(account)
+            current_site = get_current_site(request=request).domain
+            relative_url = reverse(
+                "password-reset", kwargs={"password_reset_token": password_reset_token}
+            )
+            password_reset_link = (
+                f"http://{current_site}{relative_url}"  # email password rest link
+            )
+            print(password_reset_link)
+        
         return Response(
             {"message": "A password reset link has been sent to your email."},
             status=status.HTTP_200_OK,
