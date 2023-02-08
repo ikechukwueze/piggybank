@@ -91,15 +91,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class RequestPasswordResetSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True, )
-
-    def validate_email(self, value):
-        try:
-            Account.objects.get(email=value)
-        except Account.DoesNotExist:
-            raise serializers.ValidationError({'error': 'Account with email does not exist.'})
-        else:
-            return value
+    email = serializers.EmailField(required=True)
 
 
 class UpdateBvnSerializer(serializers.Serializer):
