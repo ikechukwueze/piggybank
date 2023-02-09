@@ -13,6 +13,7 @@ class FernetCryptography:
         token = cls.encryptor.encrypt(string.encode())
         return token.decode()
 
+    @classmethod
     def fernet_decryption(cls, string: str) -> bytes:
         try:
             decrypted_string = cls.encryptor.decrypt(string.encode())
