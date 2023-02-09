@@ -3,8 +3,6 @@ from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
 
 
-
-
 class FernetCryptography:
     def __init__(self) -> None:
         key = urlsafe_base64_encode(settings.SECRET_KEY)
@@ -13,7 +11,7 @@ class FernetCryptography:
     @classmethod
     def fernet_encryption(cls, string: str) -> str:
         token = cls.encryptor.encrypt(string.encode())
-        return token
+        return token.decode()
 
     def fernet_decryption(cls, string: str) -> bytes:
         try:
