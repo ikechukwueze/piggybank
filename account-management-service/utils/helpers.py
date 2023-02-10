@@ -1,22 +1,19 @@
-from django.utils.http import urlsafe_base64_encode
 from cryptography.fernet import Fernet, InvalidToken
-from django.conf import settings
+from decouple import config
 
 
 class FernetCryptography:
     def __init__(self) -> None:
-        key = urlsafe_base64_encode(settings.SECRET_KEY)
+        key = config('FERNET_KEY')
         self.encryptor = Fernet(key)
 
-    @classmethod
-    def fernet_encryption(cls, string: str) -> str:
-        token = cls.encryptor.encrypt(string.encode())
+    def encrypt(self, string: str) -> str:
+        token = self.encryptor.encrypt(string.encode())
         return token.decode()
 
-    @classmethod
-    def fernet_decryption(cls, string: str) -> bytes:
+    def decrypt(self, string: str) -> bytes:
         try:
-            decrypted_string = cls.encryptor.decrypt(string.encode())
+            decrypted_string = self.encryptor.decrypt(string)
         except InvalidToken:
             return None
         else: 
