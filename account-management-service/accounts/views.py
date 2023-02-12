@@ -89,6 +89,11 @@ class RequestPasswordResetView(APIView):
             pass
         else:
             password_reset_token = PasswordResetTokenGenerator().make_token(account)
+            encrypted_user_id = FernetCryptography().encrypt(str(account.id))
+            relative_url_kwargs = {
+                "encrypted_user_id": encrypted_user_id,
+                "password_reset_token": password_reset_token,
+            }
             current_site = get_current_site(request=request).domain
             relative_url = reverse(
                 "password-reset", kwargs={"password_reset_token": password_reset_token}
