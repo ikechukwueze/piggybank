@@ -12,6 +12,7 @@ from .serializers import (
     UpdateBvnSerializer,
     RequestPasswordResetSerializer,
 )
+from utils.helpers import FernetCryptography
 from utils.exceptions import MaximumTokensExceeded
 from .models import Account
 
