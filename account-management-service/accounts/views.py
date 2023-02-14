@@ -96,14 +96,12 @@ class RequestPasswordResetView(APIView):
                 "password_reset_token": password_reset_token,
             }
             current_site = get_current_site(request=request).domain
-            relative_url = reverse(
-                "password-reset", kwargs={"password_reset_token": password_reset_token}
-            )
+            relative_url = reverse("password-reset", kwargs=relative_url_kwargs)
             password_reset_link = (
                 f"http://{current_site}{relative_url}"  # email password rest link
             )
             print(password_reset_link)
-        
+
         return Response(
             {"message": "A password reset link has been sent to your email."},
             status=status.HTTP_200_OK,
