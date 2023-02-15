@@ -94,6 +94,20 @@ class RequestPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value: str):
+        account = self.context["account"]
+        validate_password(password=value, user=account)
+        return value
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data["new_password"])
+        instance.save()
+        return instance
+
+
 class UpdateBvnSerializer(serializers.Serializer):
     bvn = serializers.CharField(required=True, min_length=11, max_length=11)
 

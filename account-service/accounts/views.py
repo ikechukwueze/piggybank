@@ -1,16 +1,20 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed, NotFound
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
 from .serializers import (
     SignUpSerializer,
     LoginSerializer,
     ChangePasswordSerializer,
     UpdateBvnSerializer,
     RequestPasswordResetSerializer,
+    ResetPasswordSerializer,
 )
 from utils.helpers import FernetCryptography
 from utils.exceptions import MaximumTokensExceeded
@@ -96,7 +100,7 @@ class RequestPasswordResetView(APIView):
                 "password_reset_token": password_reset_token,
             }
             current_site = get_current_site(request=request).domain
-            relative_url = reverse("request-password-reset", kwargs=relative_url_kwargs)
+            relative_url = reverse("password-reset", kwargs=relative_url_kwargs)
             password_reset_link = (
                 f"http://{current_site}{relative_url}"  # email password rest link
             )
@@ -109,7 +113,30 @@ class RequestPasswordResetView(APIView):
 
 
 class PasswordResetView(APIView):
-    pass
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, **kwargs):
+        encrypted_user_id = kwargs["encrypted_user_id"]
+        password_reset_token = kwargs["password_reset_token"]
+        decrypted_user_id = FernetCryptography().decrypt(encrypted_user_id)
+        
+        if not decrypted_user_id:
+            raise AuthenticationFailed(detail="Invalid password reset link")
+        
+        try:
+            account = Account.objects.get(id=decrypted_user_id)
+        except Account.DoesNotExist:
+            raise AuthenticationFailed(detail="Invalid password reset link")
+        else:
+            valid_token = PasswordResetTokenGenerator().check_token(account, password_reset_token)
+        
+        if not valid_token:
+            raise AuthenticationFailed(detail="Invalid password reset link")
+        
+        return redirect('http://stackoverflow.com/')
+        
+        
 
 
 class UpdateBvnView(APIView):
