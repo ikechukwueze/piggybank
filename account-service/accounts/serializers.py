@@ -94,7 +94,7 @@ class RequestPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class ResetPasswordSerializer(serializers.Serializer):
+class CompletePasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True)
 
     def validate_new_password(self, value: str):
