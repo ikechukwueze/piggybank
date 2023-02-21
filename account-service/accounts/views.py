@@ -14,7 +14,7 @@ from .serializers import (
     ChangePasswordSerializer,
     UpdateBvnSerializer,
     RequestPasswordResetSerializer,
-    ResetPasswordSerializer,
+    CompletePasswordResetSerializer,
 )
 from utils.helpers import FernetCryptography
 from utils.exceptions import MaximumTokensExceeded
@@ -112,7 +112,7 @@ class RequestPasswordResetView(APIView):
         )
 
 
-class PasswordResetView(APIView):
+class ConfirmPasswordResetLink(APIView):
     authentication_classes = []
     permission_classes = []
 
@@ -120,23 +120,43 @@ class PasswordResetView(APIView):
         encrypted_user_id = kwargs["encrypted_user_id"]
         password_reset_token = kwargs["password_reset_token"]
         decrypted_user_id = FernetCryptography().decrypt(encrypted_user_id)
-        
+
         if not decrypted_user_id:
             raise AuthenticationFailed(detail="Invalid password reset link")
-        
+
         try:
             account = Account.objects.get(id=decrypted_user_id)
         except Account.DoesNotExist:
             raise AuthenticationFailed(detail="Invalid password reset link")
         else:
-            valid_token = PasswordResetTokenGenerator().check_token(account, password_reset_token)
-        
+            valid_token = PasswordResetTokenGenerator().check_token(
+                account, password_reset_token
+            )
+
         if not valid_token:
             raise AuthenticationFailed(detail="Invalid password reset link")
         
-        return redirect('http://stackoverflow.com/')
-        
-        
+        return Response(
+            {"account_id": decrypted_user_id, "token": password_reset_token},
+            status=status.HTTP_200_OK,
+        )
+
+
+class CompletePasswordReset(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def patch(self, request):
+        account = self.request.user
+        serializer = CompletePasswordResetSerializer(
+            instance=account, data=request.data, context={"account": account}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"message": "Password changed successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 class UpdateBvnView(APIView):
