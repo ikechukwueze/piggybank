@@ -3,12 +3,10 @@ from uuid import uuid4
 
 # Create your models here.
 
-class WalletCurrency(models.Model):
-    currency = models.CharField(max_length=50)
-    currency_iso = models.CharField(max_length=5)
 
-    def __str__(self) -> str:
-        return self.currency_iso
+class Account(models.Model):
+    id = models.UUIDField(primary_key=True)
+
 
 
 class Wallet(models.Model):
@@ -18,12 +16,18 @@ class Wallet(models.Model):
         pnd = 'PND', 'PND'
 
     id = models.UUIDField(primary_key=True, default=uuid4)
-    owner = models.UUIDField()
-    currency = models.ForeignKey(WalletCurrency, on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey(Account, on_delete=models.CASCADE)
     balance = models.DecimalField(max_digits=11, decimal_places=2)
     status = models.CharField(choices=WalletStatus.choices, max_length=8)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class NairaWallet(Wallet):
+    currency = models.CharField(choices=[('NGN', 'NGN')], default='NGN', max_length=3)
 
     def __str__(self) -> str:
         return str(self.owner)
