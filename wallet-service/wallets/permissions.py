@@ -1,7 +1,8 @@
 from rest_framework import permissions
+from .models import Wallet
 
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
+class IsWalletOwner(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit it.
     Assumes the model instance has an `owner` attribute.
@@ -14,4 +15,4 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Instance must have an attribute named `owner`.
-        return obj.owner == request.user
+        return obj.owner == request.user and obj.status != Wallet.WalletStatus.pnd
