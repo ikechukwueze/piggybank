@@ -3,13 +3,13 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from .serializers import WalletBalanceSerializer
 from .models import NairaWallet
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsWalletOwner
 
 # Create your views here.
 
 
 class RetrieveWalletBalance(generics.RetrieveAPIView):
-    permission_classes = [IsOwnerOrReadOnly, IsAuthenticated]
+    permission_classes = [IsWalletOwner, IsAuthenticated]
     authentication_classes = []
     serializer_class = WalletBalanceSerializer
     queryset = NairaWallet.objects.all()
